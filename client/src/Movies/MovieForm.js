@@ -1,73 +1,75 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const initialMovie = {
-    id: "",
     title: "",
     director: "",
     metascore: "",
-    stars: []
-};
-
-const MovieForm = props => {
-     const [movie, setMovie] = useState(initialMovie);
-
-     useEffect (() => {
-         const updateMovie = props.movies.find(movie => {
-             return `${movie.id}`  === props.match.params.id;
-         });
-
-         console.log("Movie:", updateMovie);
-
-         if(updateMovie) {
-             setMovie(updateMovie);
-         }
-     }, [props.movies, props.match.params.id]);
-
-     const handleSubmit = e => {
-         e.preventDefault();
-         axios
-            .put(`http://localhost:5000/movies/${props.movie.id}`, movie)
-            .then(res => {
-                props.updateMovie(res.data);
-                props.history.push(`/update-movie/${props.movie.id}`)
-            })
-            .catch(err => console.log("Error is: ", err))
-     }
-
-     return (
-         <div>
-             <h1>Update Movie</h1>
-             <form onSubmit={handleSubmit}>
-                <input
-                    type='text'
-                    name='name'
-                    placeholder='Movie Title'
-                    value={props.movie.title}
-                />
-                <input
-                    type='text'
-                    name='name'
-                    placeholder='Director Name'
-                    value={props.movie.director}
-                />
-                <input
-                    type='text'
-                    name='name'
-                    placeholder='Metascore'
-                    value={props.movie.metascore}
-                />
-                <input
-                    type='text'
-                    name='name'
-                    placeholder='Stars of the movie'
-                    value={props.movie.stars}
-                />
-             </form>
-             <button>Update and Add</button>
-         </div>
-     )
-
+    stars: [],
 }
 
-export default MovieForm;
+export default function UpdateMovie(props) {
+  const [mov, setMov] = useState({ initialMovie });
+
+  const changeHandler = e => {
+    setMov({
+      ...mov,
+      [e.target.name]: e.target.value,
+    });
+  };
+  const updatingMovie = () => {
+    axios
+      .put(`http://localhost:5001/api/movies/${props.history.id}`, mov)
+      .then(res => console.log("Update Move: ", res))
+      .catch(err => console.log("Error Updating Move: ", err));
+  };
+  useEffect(() => {
+    const movToUpdate = props.movies.find(item => {
+      return `${item.id}` === props.match.params.id;
+    });
+
+    console.log("movToUpdate", movToUpdate);
+
+    if (movToUpdate) {
+      setMov(movToUpdate);
+    }
+  }, [props.movies, props.match.params.id]);
+
+  return (
+    <section className="update-form">
+      <form onSubmit={updatingMovie}>
+        <label htmlFor="title">Title</label>
+        <input
+          name="title"
+          type="string"
+          value={mov.title}
+          onChange={changeHandler}
+        />
+        <label htmlFor="director">Director</label>
+        <input
+          name="director"
+          type="string"
+          value={mov.director}
+          onChange={changeHandler}
+        />
+        <label htmlFor="metascore">Metascore</label>
+        <input
+          name="metascore"
+          type="number"
+          value={mov.metascore}
+          onChange={changeHandler}
+        />
+        <label htmlFor="stars">Stars</label>
+        <input
+          name="stars"
+          type="string"
+          value={mov.stars}
+          onChange={changeHandler}
+        />
+        <button>Update</button>
+      </form>
+    </section>
+  );
+}
+
+
