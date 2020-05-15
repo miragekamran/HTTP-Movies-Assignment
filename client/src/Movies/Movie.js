@@ -19,21 +19,35 @@ function Movie({ addToSavedList }) {
     fetchMovie(params.id);
   }, [params.id]);
 
-  const handleDelete = e => {
+  const handleEdit = (e) => {
+    e.preventDefault();
+
     axios
-      .delete()
-      .then(res => {
-        history.push("/");
-        console.log(res)
+      .put(`http://localhost:5000/api/movies/${params.id}`, movie)
+      .then((res) => {
+        console.log(res);
+        history.push(`/update-movie/${params.id}`);
       })
-      .catch(err => console.log(err));
+      .finally(() => window.location.reload())
+      .catch((err) => console.log("edit error", err));
+  };
+
+  const handleDelete = (e) => {
+    e.preventDefault();
+
+    axios
+      .delete(`http://localhost:5000/api/movies/${params.id}`)
+      .then((res) => {
+        history.push(`/`);
+        console.log(res);
+      })
+      .finally(() => window.location.reload())
+      .catch((err) => console.log(err));
   };
 
   const saveMovie = () => {
     addToSavedList(movie);
   };
-
-  
 
   if (!movie) {
     return <div>Loading movie information...</div>;
@@ -47,10 +61,10 @@ function Movie({ addToSavedList }) {
         Save
       </div>
 
-      <div className='edit-button' onClick={() => history.push(`/update-movie/:id`)}>
+      <div className="edit-button" onClick={() => history.push(`/update-movie/${movie.id}`)}>
         Edit
       </div>
-      <div className='delete-button' onClick={handleDelete} >
+      <div className="delete-button" onClick={handleDelete}>
         Delete
       </div>
     </div>
@@ -58,3 +72,5 @@ function Movie({ addToSavedList }) {
 }
 
 export default Movie;
+
+// onClick={() => history.push(`/update-movie/${movie.id}`)}

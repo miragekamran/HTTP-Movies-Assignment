@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useHistory } from "react-router-dom";
 
 const initialMovie = {
     title: "",
@@ -10,6 +11,7 @@ const initialMovie = {
 
 export default function UpdateMovie(props) {
   const [mov, setMov] = useState({ initialMovie });
+  const history = useHistory();
 
   const changeHandler = e => {
     setMov({
@@ -17,26 +19,35 @@ export default function UpdateMovie(props) {
       [e.target.name]: e.target.value,
     });
   };
-  const updatingMovie = () => {
-    axios
-      .put(`http://localhost:5001/api/movies/${props.history.id}`, mov)
-      .then(res => console.log("Update Move: ", res))
-      .catch(err => console.log("Error Updating Move: ", err));
-  };
+  
   useEffect(() => {
-    const movToUpdate = props.movies.find(item => {
-      return `${item.id}` === props.match.params.id;
+    const movToUpdate = props.movies.find(movie => {
+      return `${movie.id}` === props.match.params.id;
     });
 
-    console.log("movToUpdate", movToUpdate);
+    // console.log("movToUpdate", movToUpdate);
 
     if (movToUpdate) {
       setMov(movToUpdate);
     }
   }, [props.movies, props.match.params.id]);
 
+  const updatingMovie = (e) => {
+    e.preventDefault();
+    axios
+      .put(`http://localhost:5001/api/movies/${mov.id}`, mov)
+      .then(res => {
+        console.log("Update Move: ", res)
+        history.push(`/`)
+      })
+      .finally(() => window.location.reload())
+      .catch(err => console.log("Error Updating Move: ", err));
+  };
+
+
   return (
     <section className="update-form">
+      <h2>Update Movie</h2>
       <form onSubmit={updatingMovie}>
         <label htmlFor="title">Title</label>
         <input
@@ -66,7 +77,7 @@ export default function UpdateMovie(props) {
           value={mov.stars}
           onChange={changeHandler}
         />
-        <button>Update</button>
+        <button type='submit'>Update</button>
       </form>
     </section>
   );
