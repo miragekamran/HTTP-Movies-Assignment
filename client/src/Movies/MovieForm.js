@@ -84,7 +84,7 @@ export default function UpdateMovie(props) {
 					value={movie.stars}
 				/>
 
-				<button className="save-button">Update</button>
+				<button className="edit-button">Update</button>
 			</form>
 		</div>
 	);
