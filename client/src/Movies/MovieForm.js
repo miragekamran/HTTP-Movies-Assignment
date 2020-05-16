@@ -1,86 +1,93 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
+import axios from "axios";
 
 const initialMovie = {
-    title: "",
-    director: "",
-    metascore: "",
-    stars: [],
-}
+	director: "",
+	id: "",
+	metascore: "",
+	stars: [],
+	title: "",
+};
 
 export default function UpdateMovie(props) {
-  const [mov, setMov] = useState({ initialMovie });
-  const history = useHistory();
+	console.log("update", props);
+	const [movie, setMovie] = useState(initialMovie);
+	const history = useHistory();
 
-  const changeHandler = e => {
-    setMov({
-      ...mov,
-      [e.target.name]: e.target.value,
-    });
-  };
-  
-  useEffect(() => {
-    const movToUpdate = props.movies.find(movie => {
-      return `${movie.id}` === props.match.params.id;
-    });
+	useEffect(() => {
+		const movieToUpdate = props.movies.find((movie) => {
+			return `${movie.id}` === props.match.params.id;
+		});
+		if (movieToUpdate) {
+			setMovie(movieToUpdate);
+		}
+	}, [props.movies, props.match.params.id]);
 
-    // console.log("movToUpdate", movToUpdate);
+	const changeHandler = (e) => {
+		if (e.target.name === "stars") {
+			setMovie({
+				...movie,
+				[e.target.name]: e.target.value.split(","),
+			});
+		} else {
+			setMovie({
+				...movie,
+				[e.target.name]: e.target.value,
+			});
+		}
+	};
 
-    if (movToUpdate) {
-      setMov(movToUpdate);
-    }
-  }, [props.movies, props.match.params.id]);
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		axios.put(`http://localhost:5000/api/movies/${movie.id}`, movie)
+			.then((res) => console.log(res.data), history.push(`/`))
+			.finally(() => window.location.reload());
+	};
 
-  const updatingMovie = (e) => {
-    e.preventDefault();
-    axios
-      .put(`http://localhost:5001/api/movies/${mov.id}`, mov)
-      .then(res => {
-        console.log("Update Move: ", res)
-        history.push(`/`)
-      })
-      .finally(() => window.location.reload())
-      .catch(err => console.log("Error Updating Move: ", err));
-  };
+	return (
+		<div className="save-wrapper">
+			<h2>Update Movie</h2>
+			<form onSubmit={handleSubmit}>
+				<input
+					type="text"
+					name="title"
+					onChange={changeHandler}
+					placeholder="title"
+					value={movie.title}
+				/>
+				<div className="baseline" />
 
+				<input
+					type="text"
+					name="director"
+					onChange={changeHandler}
+					placeholder="director"
+					value={movie.director}
+				/>
+				<div className="baseline" />
 
-  return (
-    <section className="update-form">
-      <h2>Update Movie</h2>
-      <form onSubmit={updatingMovie}>
-        <label htmlFor="title">Title</label>
-        <input
-          name="title"
-          type="string"
-          value={mov.title}
-          onChange={changeHandler}
-        />
-        <label htmlFor="director">Director</label>
-        <input
-          name="director"
-          type="string"
-          value={mov.director}
-          onChange={changeHandler}
-        />
-        <label htmlFor="metascore">Metascore</label>
-        <input
-          name="metascore"
-          type="number"
-          value={mov.metascore}
-          onChange={changeHandler}
-        />
-        <label htmlFor="stars">Stars</label>
-        <input
-          name="stars"
-          type="string"
-          value={mov.stars}
-          onChange={changeHandler}
-        />
-        <button type='submit'>Update</button>
-      </form>
-    </section>
-  );
-}
+				<input
+					type="number"
+					name="metascore"
+					onChange={changeHandler}
+					placeholder="Metascore"
+					value={movie.metascore}
+				/>
+				<div className="baseline" />
 
+				<input
+					type="text"
+					name="stars"
+					onChange={changeHandler}
+					placeholder="Stars"
+					value={movie.stars}
+				/>
 
+				<button className="save-button">Update</button>
+			</form>
+		</div>
+	);
+};
+
+ 

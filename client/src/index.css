@@ -81,6 +81,14 @@ body {
   background-color: green;
   color: white;
 }
+.edit-button:hover {
+  background-color: green;
+  color: white;
+}
+.delete-button:hover {
+  background-color: green;
+  color: white;
+}
 
 .home-button {
   padding: 5px 10px;
